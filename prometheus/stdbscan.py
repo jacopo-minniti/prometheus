@@ -29,22 +29,26 @@ class STDBSCAN(object):
         self.min_neighbors = min_neighbors
 
     def _retrieve_neighbors(self, index_center, matrix):
-
+        
         center_point = matrix[index_center, :]
+    
 
         # filter by time
         min_time = center_point[2] - timedelta(seconds=self.temporal_threshold)
         max_time = center_point[2] + timedelta(seconds=self.temporal_threshold)
         matrix = matrix[(matrix[:, 2] >= min_time) &
                         (matrix[:, 2] <= max_time), :]
+                        
         # filter by distance
-        tmp = (matrix[:, 0]-center_point[0])*(matrix[:, 0]-center_point[0]) + \
-            (matrix[:, 1]-center_point[1])*(matrix[:, 1]-center_point[1])
-        neigborhood = matrix[tmp <= (
-            self.spatial_threshold*self.spatial_threshold), 4].tolist()
-        neigborhood.remove(index_center)
+        tmp = (matrix[:, 0] - center_point[0])**2 + (matrix[:, 1] - center_point[1])**2
+        neighborhood = matrix[tmp <= (self.spatial_threshold**2), 4].tolist()
 
-        return neigborhood
+        
+        # Remove index_center if present
+        if index_center in neighborhood:
+            neighborhood.remove(index_center)
+
+        return neighborhood
 
     def fit_transform(self, df, col_lat, col_lon, col_time,
                       col_cluster='cluster'):
@@ -71,6 +75,7 @@ class STDBSCAN(object):
         for index in range(matrix.shape[0]):
             if matrix[index, 3] == unmarked:
                 neighborhood = self._retrieve_neighbors(index, matrix)
+                print(f'NEIGHBORHOOD: {neighborhood}')
 
                 if len(neighborhood) < self.min_neighbors:
                     matrix[index, 3] = noise

@@ -1,7 +1,5 @@
 # 🔥 Prometheus - Fire Predictive Mapping
 
-![Prometheus Banner](./images/prometheus_banner.png) <!-- Replace with your actual image path -->
-
 A collaborative project by **Jacopo Minniti**, **Marina Levay**, and **Anhelina Nevmerzhytska**.
 
 ---
